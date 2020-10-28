@@ -4,6 +4,7 @@ import (
 	"game/components"
 	"game/components/asset"
 	sceneComp "game/components/scene"
+	"game/components/window"
 	"game/ecs"
 	"game/systems"
 	asset2 "game/systems/asset"
@@ -11,25 +12,22 @@ import (
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
 	"image/color"
-	"log"
 )
 
 func run() {
-	cfg := pixelgl.WindowConfig{
-		Title:                  "Game",
-		Bounds:                 pixel.Rect{pixel.Vec{X: 0, Y: 0}, pixel.Vec{X: 800, Y: 600}},
-	}
-	win, err := pixelgl.NewWindow(cfg)
-	if err != nil {
-		log.Panic(err)
-	}
 	manager := ecs.NewECSManager()
-	manager.Win = win
 	manager.NewSystem(&asset2.LoadImageSystem{})
 	manager.NewSystem(&asset2.LoadSoundSystem{})
 	manager.NewSystem(&asset2.LoadSpriteSystem{})
 	manager.NewSystem(&sceneSys.ChangeSceneSystem{})
 	manager.NewSystem(&systems.DrawSystem{})
+
+	windowManager := manager.Entitys.NewEntity()
+	windowManager.AddComponent(&window.WindowManagerComponent{})
+	mainWindow := windowManager.NewChildrenEntity()
+	mainWindow.AddComponent(&window.WindowComponent{WindowId: "main", Config: pixelgl.WindowConfig{
+		Title: "main",
+		Bounds: pixel.Rect{pixel.Vec{0, 0}, pixel.Vec{800, 600}}}})
 
 	sceneManager := manager.Entitys.NewEntity()
 	sceneManager.AddComponent(&sceneComp.SceneManagerComponent{})
@@ -50,12 +48,14 @@ func run() {
 	img.AddComponent(&asset.ImageComponent{Name: "ascii", Path: "./resorces/font/ascii.png"})
 
 	draw := mainMenuScene.NewEntity()
-	draw.AddComponent(&components.DrawComponent{Name: "ascii"})
+	draw.AddComponent(&components.DrawComponent{Name: "ascii", WindowId: "main"})
 
-	for !win.Closed() {
-		win.Clear(color.Black)
+	mainWin := mainWindow.GetComponent(&window.WindowComponent{}).(*window.WindowComponent)
+
+	for !mainWin.Window.Closed() {
+		mainWin.Window.Clear(color.Black)
 		manager.UpdateSystem()
-		win.Update()
+		mainWin.Window.Update()
 	}
 }
 

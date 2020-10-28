@@ -4,13 +4,11 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/gob"
-	"github.com/faiface/pixel/pixelgl"
 	"io/ioutil"
 	"os"
 )
 
 type ECSManager struct {
-	Win *pixelgl.Window
 	Entitys *Entity
 	systems map[string]System
 	currentEntityId int64

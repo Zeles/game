@@ -21,6 +21,7 @@ func createEntity(core *ECSManager) *Entity {
 	entity := new(Entity)
 	entity.components = make(map[string]Component)
 	entity.core = core
+	entity.isActive = true
 	entity.Init()
 	return entity
 }

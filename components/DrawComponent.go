@@ -6,6 +6,7 @@ import (
 )
 
 type DrawComponent struct {
+	WindowId string
 	Name string
 	Load bool
 	Sprite *pixel.Sprite
@@ -13,7 +14,7 @@ type DrawComponent struct {
 }
 
 func (Draw *DrawComponent)Init() {
-	Draw.isActive = false
+	Draw.isActive = true
 }
 
 func (Draw *DrawComponent)GetName() string {
